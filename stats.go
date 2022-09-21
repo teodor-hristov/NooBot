@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+var (
+	voiceStats = make(map[string]map[string]Statistics) //guild -> username -> stat
+	startTime  time.Time
+)
+
 type Statistics struct {
 	isTalking     bool
 	secondsTalked uint64
@@ -12,11 +17,6 @@ type Statistics struct {
 	timeJoined    []time.Time
 	timeLeft      []time.Time
 }
-
-var (
-	voiceStats = make(map[string]map[string]Statistics) //guild -> username -> stat
-	startTime  time.Time
-)
 
 func (stat *Statistics) UserJoined() {
 	if stat == nil {
