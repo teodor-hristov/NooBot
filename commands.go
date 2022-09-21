@@ -121,18 +121,12 @@ func playCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		sb.WriteString(CHATE + "🔸Song is already going!\n")
 	}
 
-	// When the option exists, ok = true
-	channelopt, ok := optionMap["channel"]
-	if !ok {
-		sb.WriteString(CHATE + "🔸Not valid channel!\n")
-	}
-
 	urlopt, ok := optionMap["url"]
 	if !ok {
 		sb.WriteString(CHATE + "🔸Not valid url!\n")
 	}
 
-	channel := GetChannel(i.GuildID, channelopt.StringValue())
+	channel := GetChannel(i.GuildID, i.User.ID)
 	if channel == nil {
 		sb.WriteString(CHATE + "🔸Channel not found")
 	}
