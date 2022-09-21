@@ -48,13 +48,13 @@ func discordPlayMusic(guildId string, channelId string, songUrl string) error {
 	mp[guildId].voiceConn = voiceConn
 
 	if mp[guildId].voiceConn.Ready {
-		return playSong(songUrl, mp[guildId])
+		return mp[guildId].playSong(songUrl)
 	}
 
 	return errors.New("Problem finding connecting.")
 }
 
-func playSong(songUrl string, mp *MusicPlayer) error {
+func (mp *MusicPlayer) playSong(songUrl string) error {
 	if mp == nil || mp.voiceConn == nil {
 		return errors.New("voiceConnection error")
 	}
