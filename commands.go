@@ -225,10 +225,10 @@ func talkHistoryCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	// When the option exists, ok = true
 	if option, ok := optionMap["user"]; ok {
-		sb.WriteString("Voice history for user: ")
-		sb.WriteString(option.StringValue())
-		sb.WriteString("\n")
-		sb.WriteString(UserVoiceHistory(i.GuildID, option.StringValue()))
+		stat := voiceStats[i.GuildID][option.StringValue()]
+
+		sb.WriteString("Voice history for user: " + option.StringValue() + "\n")
+		sb.WriteString(stat.GetUserVoiceHistory())
 	}
 
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

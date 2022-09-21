@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -38,18 +39,38 @@ func addHandlers() {
 }
 
 func voiceStatusUpdate(session *discordgo.Session, event *discordgo.VoiceStateUpdate) {
-	if event.ChannelID != "" {
-		UserJoined(event)
+	if session == nil || event == nil {
 		return
 	}
 
-	UserLeft(event)
+	userStat := voiceStats[event.GuildID][event.Member.User.Username]
+	if event.ChannelID == "" {
+		userStat.UserLeft()
+
+		//if bot is disconnected while playing -> turn off the music
+		if strings.Compare(event.Member.User.Username, session.State.User.Username) == 0 {
+			userStat := mp[event.GuildID]
+			userStat.isPlaying = false
+			mp[event.GuildID] = userStat
+		}
+
+		fmt.Printf("User left voice channel %s %s\nTotal talking time %d seconds\n", event.Member.User.Username, userStat.timeLeft[len(userStat.timeLeft)-1].String(),
+			userStat.secondsTalked)
+		voiceStats[event.GuildID][event.Member.User.Username] = userStat
+		return
+	}
+
+	userStat.UserJoined()
+	fmt.Printf("User joined %s %s\n", event.Member.User.Username, userStat.timeJoined[len(userStat.timeJoined)-1].String())
+
+	voiceStats[event.GuildID][event.Member.User.Username] = userStat
+	return
 }
 
 func connectToDiscord() {
 	//Connect to discord
 	var err error
-	session, err = discordgo.New("Bot " + *BotToken)
+	session, err = discordgo.New("Bot mTAxMzc5Mjg4NTE4MDczOTcxNA.Ga_ALA.3ZR4Rg7GxIt13IOP3rOWBlslRBPbR_FXoQgBoM")
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
 		return
