@@ -16,10 +16,11 @@ import (
 )
 
 const (
-	channels  int = 2
-	frameRate int = 48000
-	frameSize int = 960
-	MUSIC_DIR     = "Music/"
+	channels           int = 2
+	frameRate          int = 48000
+	frameSize          int = 960
+	MUSIC_DIR              = "Music/"
+	discordMaxFileSize     = 8000000
 )
 
 /*Map GuildID to MP*/
@@ -58,37 +59,39 @@ func (mp *MusicPlayer) playSong(songUrl string) error {
 	if mp == nil || mp.voiceConn == nil {
 		return errors.New("VoiceConnection initialization error")
 	}
-	_, err := url.ParseRequestURI(songUrl)
-	if err != nil {
+	u, err := url.ParseRequestURI(songUrl)
+	if err != nil || u.Scheme == "" || u.Host == "" || u.Path == "" {
 		return errors.New("Url is not valid.")
 	}
 
-	//old way to download music changed to yt-dlp due to slow download speed
+	//old way to download music changed to yt-dlp due to slow download speed e.g lag
 	//youtubedl := exec.Command("youtube-dl", "-f", "worst", songUrl, "-o", "-")
 	youtubedl := exec.Command("yt-dlp", "--extractor-retries", "3", "-f", "best", songUrl, "-o", "-")
 	out, err := youtubedl.StdoutPipe()
 	if err != nil {
-		return errors.New("Youtube-dl pipe problem.")
+		return err
 	}
 
 	ff := exec.Command("ffmpeg", "-i", "pipe:0", "-f", "s16le", "-ar", strconv.Itoa(frameRate), "-ac", strconv.Itoa(channels), "pipe:1")
 	ff.Stdin = out
 	musicStream, err := ff.StdoutPipe()
 	if err != nil {
-		return errors.New("FFMPEG pipe problem.")
+		return err
 	}
 
 	err = youtubedl.Start()
 	if err != nil {
-		return errors.New("Command execution failed!")
+		return err
 	}
+
 	fmt.Println("Youtube-DL started.")
 	defer youtubedl.Process.Kill()
 
 	err = ff.Start()
 	if err != nil {
-		return errors.New("Command execution failed!")
+		return err
 	}
+
 	fmt.Println("FFMPEG started.")
 	defer ff.Process.Kill()
 
@@ -125,6 +128,11 @@ func (mp *MusicPlayer) playSong(songUrl string) error {
 }
 
 func downloadSong(channelId string, songUrl string, format string) error {
+	u, err := url.ParseRequestURI(songUrl)
+	if err != nil || u.Scheme == "" || u.Host == "" || u.Path == "" {
+		return errors.New("Url is not valid.")
+	}
+
 	var stderr io.Writer
 	songName, err := GetSongName(songUrl)
 	if err != nil {
@@ -134,13 +142,13 @@ func downloadSong(channelId string, songUrl string, format string) error {
 	ytdlp := exec.Command("yt-dlp", "--extractor-retries", "3", "-f", "best", songUrl, "-o", "-")
 	out, err := ytdlp.StdoutPipe()
 	if err != nil {
-		return errors.New("Youtube-dl pipe problem.")
+		return err
 	}
 
 	ff := exec.Command("ffmpeg", "-i", "pipe:0", MUSIC_DIR+songName+format)
 	ff.Stdin = out
 	if err != nil {
-		return errors.New("FFMPEG pipe problem.")
+		return err
 	}
 
 	fmt.Println("Download started.")
@@ -164,6 +172,16 @@ func downloadSong(channelId string, songUrl string, format string) error {
 	defer reader.Close()
 	if err != nil {
 		return err
+	}
+
+	fileInfo, err := reader.Stat()
+	if err != nil {
+		return err
+	}
+
+	//only files under 8 mb will be sent need to upload other files in temp links
+	if fileInfo.Size() > discordMaxFileSize {
+		return errors.New("File too big!")
 	}
 
 	fmt.Printf("Sending file to discord channel with id: %s\n", channelId)

@@ -55,12 +55,16 @@ func (stat Statistics) GetUserVoiceHistory() string {
 		if len(stat.timeJoined) > join && stat.timeJoined[join].Before(stat.timeLeft[left]) {
 			res.WriteString("**Joined at:** ")
 			res.WriteString(stat.timeJoined[join].String())
-			join++
+			if len(stat.timeJoined)-1 != join {
+				join++
+			}
 
 		} else {
 			res.WriteString("**Left at:** ")
 			res.WriteString(stat.timeLeft[left].String())
-			left++
+			if len(stat.timeLeft)-1 != left {
+				left++
+			}
 		}
 
 	}

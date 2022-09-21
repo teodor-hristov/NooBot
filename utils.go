@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"os/exec"
 	"sort"
 	"strings"
@@ -26,14 +25,14 @@ func SortBySecond(users []Pair) {
 	})
 }
 
-func GetChannel(guildId string, channelid string) *discordgo.Channel {
+func GetChannel(guildId string, channelID string) *discordgo.Channel {
 	gc, err := session.GuildChannels(guildId)
 	if err != nil {
 		return nil
 	}
 
 	for _, i := range gc {
-		if i.Type == discordgo.ChannelTypeGuildVoice && strings.Compare(i.Name, channelid) == 0 {
+		if i.Type == discordgo.ChannelTypeGuildVoice && strings.Compare(i.Name, channelID) == 0 {
 			return i
 		}
 	}
@@ -46,7 +45,7 @@ func GetSongName(url string) (string, error) {
 	name, err := youtubedl.CombinedOutput()
 
 	if err != nil {
-		return "", errors.New("Youtube-dl pipe problem.")
+		return "", err
 	}
 
 	defer youtubedl.Process.Kill()
