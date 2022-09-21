@@ -126,7 +126,12 @@ func playCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		sb.WriteString(CHATE + "🔸Not valid url!\n")
 	}
 
-	channel := GetChannel(i.GuildID, i.User.ID)
+	channelopt, ok := optionMap["channel"]
+	if !ok {
+		sb.WriteString(CHATE + "🔸Not valid channel!\n")
+	}
+
+	channel := GetChannel(i.GuildID, channelopt.StringValue())
 	if channel == nil {
 		sb.WriteString(CHATE + "🔸Channel not found")
 	}
@@ -138,8 +143,21 @@ func playCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		go func() {
 			err := discordPlayMusic(i.GuildID, channel.ID, urlopt.StringValue())
 			if err != nil {
+				var userizedErr string
+
+				/*If the error can be fixed by user -> tell him/her*/
+				if strings.Contains("input", err.Error()) || strings.Contains(err.Error(), "Url") {
+					userizedErr = "🔸URL link is not valid!"
+				} else if strings.Contains(err.Error(), "connection") {
+					userizedErr = "🔸Problem connecting to given channel!"
+				} else if strings.Contains(err.Error(), "speak") {
+					userizedErr = "🔸Problem occured while trying to speak!"
+				} else {
+					userizedErr = "🔸Internal error occured!"
+				}
+
+				session.ChannelMessageSend(i.ChannelID, CHATE+userizedErr)
 				fmt.Print(err)
-				session.ChannelMessageSend(i.ChannelID, CHATE+" Something went wrong!")
 			}
 
 			mp[i.GuildID].voiceConn.Disconnect()
@@ -187,8 +205,19 @@ func downloadSongCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		go func() {
 			err := downloadSong(i.ChannelID, urlopt.StringValue(), formatopt.StringValue())
 			if err != nil {
+				var userizedErr string
+
+				/*If the error can be fixed by user -> tell him/her*/
+				if strings.Contains(err.Error(), "Url") {
+					userizedErr = "🔸URL link is not valid!"
+				} else if strings.Contains(err.Error(), "big") {
+					userizedErr = "🔸Converted file too long to send directly in chat!"
+				} else {
+					userizedErr = "🔸Internal error occured!"
+				}
+
+				session.ChannelMessageSend(i.ChannelID, CHATE+userizedErr)
 				fmt.Print(err)
-				session.ChannelMessageSend(i.ChannelID, CHATE+" Something went wrong... 👀")
 			}
 		}()
 	}
