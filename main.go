@@ -34,6 +34,7 @@ func addIntents() {
 
 func addHandlers() {
 	addHandlersToCommands()
+
 	session.AddHandler(voiceStatusUpdate)
 }
 
@@ -69,7 +70,7 @@ func voiceStatusUpdate(session *discordgo.Session, event *discordgo.VoiceStateUp
 func connectToDiscord() {
 	//Connect to discord
 	var err error
-	session, err = discordgo.New("Bot MTAxMzc5Mjg4NTE4MDczOTcxNA.Ga_ALA.3ZR4Rg7GxIt13IOP3rOWBlslRBPbR_FXoQgBoM")
+	session, err = discordgo.New("Bot mTAxMzc5Mjg4NTE4MDczOTcxNA.Ga_ALA.3ZR4Rg7GxIt13IOP3rOWBlslRBPbR_FXoQgBoM")
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
 		return
