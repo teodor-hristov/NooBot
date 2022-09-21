@@ -51,14 +51,14 @@ func discordPlayMusic(guildId string, channelId string, songUrl string) error {
 		return mp[guildId].playSong(songUrl)
 	}
 
-	return errors.New("Problem finding connecting.")
+	return errors.New("Problem finding connection.")
 }
 
 func (mp *MusicPlayer) playSong(songUrl string) error {
 	if mp == nil || mp.voiceConn == nil {
-		return errors.New("voiceConnection error")
+		return errors.New("VoiceConnection initialization error")
 	}
-	_, err := url.Parse(songUrl)
+	_, err := url.ParseRequestURI(songUrl)
 	if err != nil {
 		return errors.New("Url is not valid.")
 	}
