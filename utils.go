@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	CHATI      = "👋 Hey!"
-	CHATE      = "👳‍♂️Ooops!"
+	CHATI      = "👋 Hey! "
+	CHATE      = "👳‍♂️Ooops! "
 	NEW_MEMBER = "👋 Glad to see you here "
 )
 
@@ -41,7 +41,7 @@ func GetChannel(guildId string, channelid string) *discordgo.Channel {
 	return nil
 }
 
-func getSongName(url string) (string, error) {
+func GetSongName(url string) (string, error) {
 	youtubedl := exec.Command("yt-dlp", "--get-title", url, "-o", "-")
 	name, err := youtubedl.CombinedOutput()
 

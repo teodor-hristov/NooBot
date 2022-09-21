@@ -126,7 +126,7 @@ func (mp *MusicPlayer) playSong(songUrl string) error {
 
 func downloadSong(channelId string, songUrl string, format string) error {
 	var stderr io.Writer
-	songName, err := getSongName(songUrl)
+	songName, err := GetSongName(songUrl)
 	if err != nil {
 		return err
 	}
