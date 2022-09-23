@@ -38,6 +38,9 @@ func (stat *Statistics) UserLeft() {
 
 	//the only reason for len(stat.timeJoined) to be 0 is when bot is after the other person (who left)
 	if len(stat.timeJoined) == 0 {
+		if startTime.IsZero() {
+			startTime = time.Now()
+		}
 		stat.timeJoined = append(stat.timeJoined, startTime)
 	}
 
