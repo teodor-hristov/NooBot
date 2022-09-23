@@ -18,16 +18,6 @@ var (
 	session  *discordgo.Session
 )
 
-func init() {
-	flag.Parse()
-
-	connectToDiscord()
-
-	for _, item := range session.State.Guilds {
-		voiceStats[item.ID] = make(map[string]Statistics)
-	}
-}
-
 func addIntents() {
 	session.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
 }
@@ -98,6 +88,14 @@ func disconnectFromDiscord() {
 }
 
 func main() {
+	flag.Parse()
+
+	connectToDiscord()
+
+	for _, item := range session.State.Guilds {
+		voiceStats[item.ID] = make(map[string]Statistics)
+	}
+
 	addHandlers()
 	addIntents()
 
