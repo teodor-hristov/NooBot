@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"os/exec"
 	"strconv"
@@ -59,8 +58,8 @@ func (mp *MusicPlayer) playSong(songUrl string) error {
 	if mp == nil || mp.voiceConn == nil {
 		return errors.New("VoiceConnection initialization error")
 	}
-	u, err := url.ParseRequestURI(songUrl)
-	if err != nil || u.Scheme == "" || u.Host == "" || u.Path == "" {
+
+	if IsValidURL(songUrl) {
 		return errors.New("Url is not valid.")
 	}
 
@@ -128,8 +127,7 @@ func (mp *MusicPlayer) playSong(songUrl string) error {
 }
 
 func downloadSong(channelId string, songUrl string, format string) error {
-	u, err := url.ParseRequestURI(songUrl)
-	if err != nil || u.Scheme == "" || u.Host == "" || u.Path == "" {
+	if IsValidURL(songUrl) {
 		return errors.New("Url is not valid.")
 	}
 
