@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"os/exec"
 	"sort"
 	"strings"
@@ -53,4 +54,13 @@ func GetSongName(url string) (string, error) {
 
 	name = name[:len(name)-1]
 	return string(name), nil
+}
+
+func IsValidURL(songUrl string) bool {
+	u, err := url.ParseRequestURI(songUrl)
+	if err != nil || u.Scheme == "" || u.Host == "" || u.Path == "" {
+		return false
+	}
+
+	return true
 }
