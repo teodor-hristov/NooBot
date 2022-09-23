@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/url"
 	"os/exec"
 	"sort"
@@ -42,6 +43,10 @@ func GetChannel(guildId string, channelID string) *discordgo.Channel {
 }
 
 func GetSongName(url string) (string, error) {
+	if !IsValidURL(url) {
+		return "", errors.New("Invalid input!")
+	}
+
 	youtubedl := exec.Command("yt-dlp", "--get-title", url, "-o", "-")
 	name, err := youtubedl.CombinedOutput()
 
@@ -58,7 +63,7 @@ func GetSongName(url string) (string, error) {
 
 func IsValidURL(songUrl string) bool {
 	u, err := url.ParseRequestURI(songUrl)
-	if err != nil || u.Scheme == "" || u.Host == "" || u.Path == "" {
+	if err != nil || u.Scheme == "" || u.Host == "" {
 		return false
 	}
 
