@@ -35,6 +35,7 @@ func addIntents() {
 func addHandlers() {
 	addHandlersToCommands()
 
+	//when someone enters voice chat
 	session.AddHandler(voiceStatusUpdate)
 }
 
@@ -70,7 +71,7 @@ func voiceStatusUpdate(session *discordgo.Session, event *discordgo.VoiceStateUp
 func connectToDiscord() {
 	//Connect to discord
 	var err error
-	session, err = discordgo.New("Bot mTAxMzc5Mjg4NTE4MDczOTcxNA.Ga_ALA.3ZR4Rg7GxIt13IOP3rOWBlslRBPbR_FXoQgBoM")
+	session, err = discordgo.New("Bot" + *BotToken)
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
 		return
@@ -87,7 +88,12 @@ func connectToDiscord() {
 }
 
 func disconnectFromDiscord() {
-	session.Close()
+	err := session.Close()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	fmt.Print("Connection closed.\n")
 }
 
@@ -98,7 +104,7 @@ func main() {
 	createCommands()
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("----------------------------\nIntroToGo is now running.  Press CTRL-C to exit.\n----------------------------")
+	fmt.Println("----------------------------\nBot is now running.  Press CTRL-C to exit.\n----------------------------")
 
 	stopBot := make(chan os.Signal, 1)
 	signal.Notify(stopBot, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
