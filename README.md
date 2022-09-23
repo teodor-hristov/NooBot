@@ -9,6 +9,8 @@
 
 /voice-chat-top - All people talked since bot connected to the server (sorted)
 
+/download `<url>` `<.format>`
+
 ## Example 
 ```
 /play General https://soundcloud.com/lil-jairmy/alaska
@@ -21,6 +23,9 @@
 ```
 ```
 /voice-chat-top
+```
+```
+/download https://soundcloud.com/lil-jairmy/alaska .mp3
 ```
 
 ### Build with
