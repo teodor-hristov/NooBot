@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"strings"
 	"time"
 )
@@ -46,27 +47,28 @@ func (stat *Statistics) UserLeft() {
 func (stat Statistics) GetUserVoiceHistory() string {
 	var res strings.Builder
 
-	arrLen := len(stat.timeJoined) + len(stat.timeLeft)
-	join := 0
-	left := 0
+	//sort all times
+	allTimes := append(stat.timeJoined, stat.timeLeft...)
+	sort.Slice(allTimes, func(i, j int) bool {
+		return allTimes[i].Before(allTimes[j])
+	})
 
-	for i := 0; i < arrLen; i++ {
-		res.WriteString("\n")
-		if len(stat.timeJoined) > join && stat.timeJoined[join].Before(stat.timeLeft[left]) {
-			res.WriteString("**Joined at:** ")
-			res.WriteString(stat.timeJoined[join].String())
-			if len(stat.timeJoined)-1 != join {
-				join++
-			}
+	i := 0
+	if len(stat.timeJoined) < len(stat.timeLeft) {
+		res.WriteString("⛔️ **Left at:** " + allTimes[i].String() + "\n")
+		i++
+	}
 
-		} else {
-			res.WriteString("**Left at:** ")
-			res.WriteString(stat.timeLeft[left].String())
-			if len(stat.timeLeft)-1 != left {
-				left++
-			}
+	odd := true
+	for ; i < len(allTimes); i++ {
+		if odd {
+			res.WriteString("✅ **Joined at:** " + allTimes[i].String() + "\n")
+			odd = false
+			continue
 		}
 
+		res.WriteString("⛔️ **Left at:** " + allTimes[i].String() + "\n")
+		odd = true
 	}
 
 	return res.String()
